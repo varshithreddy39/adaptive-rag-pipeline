@@ -1,15 +1,12 @@
 import os
-import requests
+from huggingface_hub import InferenceClient
 
-
-HF_TOKEN = os.getenv("HF_TOKEN")
-
-MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-
-API_URL = (
-    f"https://router.huggingface.co/hf-inference/"
-    f"models/{MODEL_NAME}"
+client = InferenceClient(
+    provider="hf-inference",
+    api_key=os.getenv("HF_TOKEN")
 )
+
+MODEL_NAME = "BAAI/bge-reranker-v2-m3"
 
 
 def rerank_chunks(query, chunks, top_k=3):
@@ -17,33 +14,23 @@ def rerank_chunks(query, chunks, top_k=3):
     if not chunks:
         return []
 
-    headers = {
-        "Authorization": f"Bearer {HF_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    scored_chunks = []
 
-    payload = {
-        "inputs": {
-            "query": query,
-            "texts": chunks
-        }
-    }
+    for chunk in chunks:
 
-    response = requests.post(
-        API_URL,
-        headers=headers,
-        json=payload,
-        timeout=60
-    )
+        text = f"Query: {query}\nDocument: {chunk}"
 
-    response.raise_for_status()
+        result = client.text_classification(
+            text,
+            model=MODEL_NAME,
+            top_k=1
+        )
 
-    results = response.json()
+        score = result[0]["score"]
 
-    scored_chunks = [
-        (chunks[item["index"]], item["score"])
-        for item in results
-    ]
+        scored_chunks.append(
+            (chunk, score)
+        )
 
     scored_chunks.sort(
         key=lambda x: x[1],
