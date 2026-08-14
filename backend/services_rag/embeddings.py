@@ -1,19 +1,38 @@
-from sentence_transformers import SentenceTransformer
+import os
 import numpy as np
+from huggingface_hub import InferenceClient
 
-model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
+
+client = InferenceClient(
+    provider="hf-inference",
+    api_key=os.getenv("HF_TOKEN")
 )
+
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+
 
 def generate_embeddings(data):
 
-    print("🔥 ENTERED generate_embeddings", flush=True)
+    embeddings = []
 
-    embeddings = model.encode(
-        data,
-        convert_to_numpy=True
+    for text in data:
+
+        embedding = client.feature_extraction(
+            text,
+            model=MODEL_NAME
+        )
+
+        embedding = np.asarray(
+            embedding,
+            dtype="float32"
+        )
+
+        if embedding.ndim > 1:
+            embedding = embedding.mean(axis=0)
+
+        embeddings.append(embedding)
+
+    return np.asarray(
+        embeddings,
+        dtype="float32"
     )
-
-    print("🔥 EMBEDDINGS GENERATED", flush=True)
-
-    return np.array(embeddings.astype("float32"))
