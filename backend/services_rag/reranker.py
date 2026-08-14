@@ -1,5 +1,4 @@
 import os
-import numpy as np
 from huggingface_hub import InferenceClient
 
 
@@ -16,27 +15,15 @@ def rerank_chunks(query, chunks, top_k=3):
     if not chunks:
         return []
 
-    pairs = [
-        [query, chunk]
-        for chunk in chunks
-    ]
-
-    scores = []
-
-    for pair in pairs:
-
-        result = client.text_classification(
-            text=pair[0],
-            model=MODEL_NAME
-        )
-
-        scores.append(float(result[0]["score"]))
-
-    scored_chunks = list(zip(chunks, scores))
-
-    scored_chunks.sort(
-        key=lambda x: x[1],
-        reverse=True
+    result = client.text_ranking(
+        query=query,
+        texts=chunks,
+        model=MODEL_NAME
     )
+
+    scored_chunks = [
+        (chunks[item.index], item.score)
+        for item in result
+    ]
 
     return scored_chunks[:top_k]
