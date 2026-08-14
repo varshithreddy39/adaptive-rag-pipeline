@@ -17,7 +17,12 @@
 
 A production-inspired Retrieval-Augmented Generation (RAG) system for intelligent PDF question answering using Hybrid Retrieval, Query Rewriting, Multi-Query Retrieval (MQR), Cross-Encoder Reranking, Conversation Memory, Source Citations, and RAGAS Evaluation.
 
----
+## 🌐 Live Demo
+
+🚀 **Try the deployed application:**  
+👉 https://adaptive-rag-pipeline-6kviiqu2xoe6st4f4nmu5a.streamlit.app/
+
+> Upload a PDF and ask questions about its contents using the Adaptive RAG pipeline.
 
 ## 📌 Overview
 
