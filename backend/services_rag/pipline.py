@@ -105,9 +105,9 @@ def handle_upload(
         "chunks": chunk,
         "Source": filename
         })
-
+    print("🔥 BEFORE EMBEDDINGS", flush=True)
     new_embeddings = generate_embeddings(chunks)
-
+    print("🔥 AFTER EMBEDDINGS", flush=True)
     store_embeddings.extend(new_embeddings)
 
     print(
