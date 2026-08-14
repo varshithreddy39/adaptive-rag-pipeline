@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-BASE_URL = "http://backend:8000"
+BASE_URL = st.secrets["BACKEND_URL"]
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
